@@ -29,6 +29,8 @@ def get_meta_list_from_path(folder_path="./") -> list:
 
 
 def get_comment_from_meta_file(meta_list=[]) -> dict:
+    # meta data list -> comment's dictionary
+
     comment_list = {}
     for i, meta_file in enumerate(meta_list):
         with open(meta_file) as f:
@@ -42,6 +44,8 @@ def get_comment_from_meta_file(meta_list=[]) -> dict:
 
 
 def get_terminalid_from_meta_file(meta_list=[]) -> dict:
+    # meta data list -> TerminalID's dictionary
+
     terminal_id_list = {}
     for i, meta_file in enumerate(meta_list):
         with open(meta_file) as f:
@@ -55,6 +59,8 @@ def get_terminalid_from_meta_file(meta_list=[]) -> dict:
 
 
 def get_tags_from_meta_file(meta_list=[]) -> dict:
+    # meta data list -> tags' dictionary
+
     tags_list = {}
     for i, meta_file in enumerate(meta_list):
         with open(meta_file) as f:
@@ -68,6 +74,7 @@ def get_tags_from_meta_file(meta_list=[]) -> dict:
 
 
 def comment_to_info(comment_dict: dict) -> list:
+    # comment's dictionary -> height, weight, gender, type dictionaries' list
     # return : list of dict
     height = {}
     weight = {}
@@ -102,6 +109,7 @@ def comment_to_info(comment_dict: dict) -> list:
 
 
 def tags_to_info(tags_dict: dict) -> dict:
+    # tags' dictionary -> activity's dictinary
     activity = {}
 
     for key, strs in tags_dict.items():
@@ -112,6 +120,7 @@ def tags_to_info(tags_dict: dict) -> dict:
 
 
 def make_df_from_dicts(len_of_data: int, dict_list: list, dict_dict: dict) -> pd.DataFrame:
+    # dictionaries -> DataFrame
     data_list = []
 
     for i in range(len_of_data):
