@@ -9,13 +9,13 @@ import numpy as np
 import pandas as pd
 
 
-def get_meta_list_from_path(folder_path="./") -> list:
+def get_meta_list_from_path(folder_path=".\\") -> list:
     # folder_pathのフォルダから拡張子がmetaのファイルを抽出，リスト化しreturnする
 
     meta_data_list = []
 
-    if folder_path[-1] != "/":
-        folder_path += "/"
+    if folder_path[-1] != "\\":
+        folder_path += "\\"
     dirlist = os.listdir(folder_path)
 
     for name in dirlist:
@@ -114,7 +114,7 @@ def tags_to_info(tags_dict: dict) -> dict:
 
     for key, strs in tags_dict.items():
         info = re.findall(r" \D+", strs)
-        activity[key] = info[0]
+        activity[key] = info[0].strip()
     # print(activity)
     return activity
 
@@ -133,6 +133,41 @@ def make_df_from_dicts(len_of_data: int, dict_list: list, dict_dict: dict) -> pd
         data_list.append(tmp_list)
 
     return pd.DataFrame(data_list, index=np.arange(len_of_data), columns=dict_list)
+
+
+def to_act_num(label_df: pd.DataFrame) -> pd.Series:
+    # labeling
+
+    # 0 = high down
+    # 1 = low down
+    # 2 = Walk
+    # 3 = low up
+    # 4 = high up
+    # 5 = other
+    act_num = []
+
+    activity = label_df["Activity"].values
+    types = label_df["Type"].values
+
+    for i, act in enumerate(activity):
+        if act == "Walk":
+            act_number = 2
+        elif act == "Up":
+            if types[i] == "l":
+                act_number = 3
+            else:
+                act_number = 4
+        elif act == "Down":
+            if types[i] == "l":
+                act_number = 2
+            else:
+                act_number = 1
+        else:
+            act_number = 5
+
+        act_num.append(act_number)
+
+    return pd.Series(act_num)
 
 
 if __name__ == "__main__":
@@ -154,9 +189,17 @@ if __name__ == "__main__":
     activity = tags_to_info(tags_dict=tags_dict)
     # print(activity)
 
+    meta_dict = dict(zip(range(len(meta_list)), meta_list))
+    # print(meta_dict)
+
     label_df = make_df_from_dicts(len(meta_list),
-                                  ("Activity", "Type", "Height", "Weight", "Gender", "TerminalID", "Comment", "Tags"),
-                                  {"Activity": activity, "Type": species, "Height": height, "Weight": weight, "Gender": gender, "Tags": tags_dict, "Comment": comment_dict, "TerminalID": terminal_id_dict})
+                                  ("Activity", "Type", "Height", "Weight", "Gender", "Path", "TerminalID", "Comment", "Tags"),
+                                  {"Activity": activity, "Type": species, "Height": height, "Weight": weight, "Gender": gender, "Tags": tags_dict, "Comment": comment_dict, "TerminalID": terminal_id_dict, "Path": meta_dict})
+
+    label_df["act_num"] = to_act_num(label_df)
+
+    # 並び替え
+    label_df = label_df[["Activity", "Type", "act_num", "Height", "Weight", "Gender", "Path", "TerminalID", "Comment", "Tags"]]
 
     label_df.to_csv(".\\data\\y.csv")
-    print("saved in './data/y.csv'")
+    print("saved in '.\\data\\y.csv'")
