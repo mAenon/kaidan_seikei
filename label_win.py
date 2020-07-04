@@ -184,7 +184,8 @@ if __name__ == "__main__":
     # print(comment_list)
     terminal_id_dict = get_terminalid_from_meta_file(meta_list=meta_list)
     # print(terminal_id_list)
-    height, weight, gender, species = comment_to_info(comment_dict=comment_dict)
+    height, weight, gender, species = comment_to_info(
+        comment_dict=comment_dict)
     # print(height, weight, gender, species)
     activity = tags_to_info(tags_dict=tags_dict)
     # print(activity)
@@ -193,13 +194,17 @@ if __name__ == "__main__":
     # print(meta_dict)
 
     label_df = make_df_from_dicts(len(meta_list),
-                                  ("Activity", "Type", "Height", "Weight", "Gender", "Path", "TerminalID", "Comment", "Tags"),
+                                  ("Activity", "Type", "Height", "Weight", "Gender",
+                                   "Path", "TerminalID", "Comment", "Tags"),
                                   {"Activity": activity, "Type": species, "Height": height, "Weight": weight, "Gender": gender, "Tags": tags_dict, "Comment": comment_dict, "TerminalID": terminal_id_dict, "Path": meta_dict})
 
     label_df["act_num"] = to_act_num(label_df)
 
     # 並び替え
-    label_df = label_df[["Activity", "Type", "act_num", "Height", "Weight", "Gender", "Path", "TerminalID", "Comment", "Tags"]]
+    label_df = label_df[["Activity", "Type", "act_num", "Height",
+                         "Weight", "Gender", "Path", "TerminalID", "Comment", "Tags"]]
 
+    if not os.path.exists(".\\data"):
+        os.mkdir(".\\data")
     label_df.to_csv(".\\data\\y.csv")
     print("saved in '.\\data\\y.csv'")
