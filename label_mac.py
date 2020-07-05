@@ -159,9 +159,9 @@ def to_act_num(label_df: pd.DataFrame) -> pd.Series:
                 act_number = 4
         elif act == "Down":
             if types[i] == "l":
-                act_number = 2
-            else:
                 act_number = 1
+            else:
+                act_number = 0
         else:
             act_number = 5
 
@@ -171,14 +171,6 @@ def to_act_num(label_df: pd.DataFrame) -> pd.Series:
 
 
 def identify_acter(label_df: pd.DataFrame) -> pd.Series:
-    # TODO 辞書での処理に変更する
-    # ↑配列での処理をするとNoneの部分について処理してしまってうまく動かないので
-
-    # TODO Noneの含まれている列について，うまく処理されずデータフレームの末端が空白になっている　→　配列の処理から辞書での処理に変更することで対処可能かも
-    # XXX 上記のせいでto_categorical, astype(np.int)がうまく動作しない
-
-    # TODO label_df["actor"]が実数値にならない
-
     # ------------------
     # array版
     # ------------------
@@ -292,9 +284,9 @@ if __name__ == "__main__":
     label_df = label_df[["Activity", "Type", "act_num", "actor", "Height",
                          "Weight", "Gender", "Path", "TerminalID", "Comment", "Tags"]]
 
-    print(label_df.head())
-    print(type(label_df["actor"].values[0]))
+    label_df_s = label_df.sort_values(["actor", "act_num"], ascending=True)
+    label_df_s.index = list(label_df.index)
     if not os.path.exists("./data"):
         os.mkdir("./data")
-    label_df.to_csv("./data/y.csv", mode="w")
+    label_df_s.to_csv("./data/y.csv", mode="w")
     print("saved in './data/y.csv'")
