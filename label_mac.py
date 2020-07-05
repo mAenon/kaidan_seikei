@@ -8,8 +8,6 @@ import numpy as np
 
 import pandas as pd
 
-from tensorflow.keras.utils import to_categorical
-
 
 def get_meta_list_from_path(folder_path=".\\") -> list:
     # folder_pathのフォルダから拡張子がmetaのファイルを抽出，リスト化しreturnする
@@ -173,30 +171,87 @@ def to_act_num(label_df: pd.DataFrame) -> pd.Series:
 
 
 def identify_acter(label_df: pd.DataFrame) -> pd.Series:
-    # TODO Noneの含まれている列について，うまく処理されずデータフレームの末端が空白になっている
+    # TODO 辞書での処理に変更する
+    # ↑配列での処理をするとNoneの部分について処理してしまってうまく動かないので
+
+    # TODO Noneの含まれている列について，うまく処理されずデータフレームの末端が空白になっている　→　配列の処理から辞書での処理に変更することで対処可能かも
+    # XXX 上記のせいでto_categorical, astype(np.int)がうまく動作しない
+
     # TODO label_df["actor"]が実数値にならない
 
-    duplicated_label = label_df[label_df[["Height", "Weight"]].duplicated() == False][[
+    # ------------------
+    # array版
+    # ------------------
+    #
+    # duplicated_label = label_df[~label_df[["Height", "Weight"]].duplicated()][[
+    #     "Height", "Weight"]].values
+    # num_of_actor = []
+    # for i, *d in enumerate(duplicated_label):
+    #     num_of_actor.append([i, d])
+
+    # flag = 0
+    # for i in range(len(num_of_actor)):
+    #     if np.isnan(num_of_actor[i][1][0][0]):
+    #         flag = 1
+    #         num_of_actor[i][0] = 0
+    #     if flag:
+    #         num_of_actor[i][0] -= 1
+
+    # number = []
+    # for i in range(len(label_df.index)):
+    #     for j in range(len(num_of_actor)):
+    #         if label_df.iloc[i]["Height"] == num_of_actor[j][1][0][0] and label_df.iloc[i]["Weight"] == num_of_actor[j][1][0][1]:
+    #             number.append(int(j))
+    # return pd.Series(number)
+    # -------------------
+    # array版
+    # -------------------
+    # ------------------------------------------------------------ #
+    # -------------------
+    # distionary版
+    # -------------------
+
+    # 人の番号付け
+    # 1.番号付用の配列生成
+    # 2.番号付用の辞書生成
+    # 3.番号の配列生成
+    # 4.Seriesにして返す
+
+    # 1.番号付用の配列生成
+    duplicated_array = label_df[~label_df[["Height", "Weight"]].duplicated()][[
         "Height", "Weight"]].values
-    num_of_actor = []
-    for i, *d in enumerate(duplicated_label):
-        num_of_actor.append([i, d])
 
-    flag = 0
-    for i in range(len(num_of_actor)):
-        if np.isnan(num_of_actor[i][1][0][0]):
-            flag = 1
-            num_of_actor[i][0] = 0
+    # 2.番号付用の辞書生成
+    actor_dict = {}
+    flag = False
+    for i, value in enumerate(duplicated_array):
+        value = value.tolist()
         if flag:
-            num_of_actor[i][0] -= 1
+            actor_dict[i - 1] = value
+            continue
+        elif np.isnan(value[0]):
+            flag = True
+            actor_dict[len(duplicated_array) - 1] = value
+            continue
+        else:
+            actor_dict[i] = value
+            continue
 
-    number = []
-    for i in range(len(label_df.index)):
-        for j in range(len(num_of_actor)):
-            if label_df.iloc[i]["Height"] == num_of_actor[j][1][0][0] and label_df.iloc[i]["Weight"] == num_of_actor[j][1][0][1]:
-                number.append(int(j))
+    # 3.番号の配列生成
+    num_of_actor = []
+    value_list = label_df[["Height", "Weight"]].values
+    for values in value_list:
+        for num, value in actor_dict.items():
+            if np.isnan(values[0]) and np.isnan(values[1]):
+                if np.isnan(value[0]) and np.isnan(value[1]):
+                    num_of_actor.append(num)
+                    break
+            elif values[0] == value[0] and values[1] == value[1]:
+                num_of_actor.append(num)
+                break
 
-    return pd.Series(number)
+    # 4.series化して返す
+    return pd.Series(num_of_actor)
 
 
 if __name__ == "__main__":
@@ -227,14 +282,16 @@ if __name__ == "__main__":
                                    "Path", "TerminalID", "Comment", "Tags"),
                                   {"Activity": activity, "Type": species, "Height": height, "Weight": weight, "Gender": gender, "Tags": tags_dict, "Comment": comment_dict, "TerminalID": terminal_id_dict, "Path": meta_dict})
 
+    # 行動の番号付
     label_df["act_num"] = to_act_num(label_df)
 
+    # 人の番号付
+    label_df["actor"] = identify_acter(label_df)
+
     # 並び替え
-    label_df = label_df[["Activity", "Type", "act_num", "Height",
+    label_df = label_df[["Activity", "Type", "act_num", "actor", "Height",
                          "Weight", "Gender", "Path", "TerminalID", "Comment", "Tags"]]
 
-    label_df["actor"] = identify_acter(label_df).astype("int32")
-    to_categorical(label_df["actor"])
     print(label_df.head())
     print(type(label_df["actor"].values[0]))
     if not os.path.exists("./data"):
