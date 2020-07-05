@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_meta_list_from_path(folder_path=".\\") -> list:
+def get_meta_list_from_path(folder_path="./") -> list:
     # folder_pathのフォルダから拡張子がmetaのファイルを抽出，リスト化しreturnする
 
     meta_data_list = []
