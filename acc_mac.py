@@ -31,7 +31,7 @@ def get_acc_list_from_label_csv(data_dir_path="./") -> [list, pd.DataFrame]:
     print("update", label_path)
 
     # nan を消して使えるデータのみ残す
-    label_df_csv = label_df.dropna(
+    label_df_csv = label_df[label_df["act_num"] != 5].dropna(
         subset=["Height", "Weight", "acc_file_path"])
     acc_data_list = label_df_csv["acc_file_path"].values
     label_df_csv.to_csv(new_label_path, index=False)
