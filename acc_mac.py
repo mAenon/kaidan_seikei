@@ -84,6 +84,10 @@ def crop_data(acc_data_list: [[np.ndarray]], crop_size=256, strides=128, del_hea
     for x, y, z in zip(x_data, y_data, z_data):
         maxlen = len(x)
         cropping_num = maxlen // crop_size
+        if cropping_num == 0:
+            num_of_separate.append(cropping_num)
+            continue
+
         if ~how:
             cropping_num += 1
 
@@ -115,6 +119,8 @@ def make_new_label_csv(label: pd.DataFrame, cropped_data_list: [np.ndarray], sep
         writer.writerows(cropped_data_list)
 
     for i, num in enumerate(separate_num):
+        if num == 0:
+            continue
         for j in range(num):
             new_label = new_label.append(label.iloc[i, 1:])
     new_label.to_csv(label_path, index=False)
