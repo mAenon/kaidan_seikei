@@ -105,11 +105,19 @@ def make_new_label_csv(label: pd.DataFrame, cropped_data_list: [np.ndarray], sep
     # make new DataFrame, save y_crop.csv
     # make cropped_data_file: x_crop.csv
     # return success?
+    new_label = label.iloc[0:0, 1:]
     data_path = data_dir_path + "x_crop.csv"
     label_path = data_dir_path + "y_crop.csv"
+
     with open(data_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(cropped_data_list)
+
+    for i, num in enumerate(separate_num):
+        for j in range(num):
+            new_label = new_label.append(label.iloc[i, 1:])
+    new_label.to_csv(label_path, index=False)
+    print("saved :", label_path)
     return False
 
 
