@@ -35,6 +35,7 @@ def get_acc_list_from_label_csv(data_dir_path="./") -> [list, pd.DataFrame]:
         subset=["Height", "Weight", "acc_file_path"])
     acc_data_list = label_df_csv["acc_file_path"].values
     label_df_csv.to_csv(new_label_path, index=False)
+    print("saved :", new_label_path)
     return acc_data_list, label_df_csv
 
 
