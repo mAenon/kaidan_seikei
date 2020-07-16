@@ -58,3 +58,9 @@ cropped_data_list, separate_num =
     crop_data(acc_data_list, how="strides")
 ```
 としたときは端数のデータをストライド幅を調整して残す
+
+## acc_drop_mac.py
+***
+***actor*** を参照し，ある数人について，削除して  
+***x_drop.csv*** ***y_crop_drop.csv*** ***x_crop_drop.csv***  
+にする
