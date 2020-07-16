@@ -37,7 +37,7 @@ def get_acc_list_from_label_csv(data_dir_path="./") -> [list, pd.DataFrame]:
     # labeling がミスってるデータを取り除く, actorで指定
     # actor = 1, 5を捨てる
     label_df_csv = label_df_csv[~(label_df_csv["actor"] == 1) &
-                                ~(label_df_csv["actor"] == 5)]
+                                ~(label_df_csv["actor"] == 1)]
 
     acc_data_list = label_df_csv["acc_file_path"].values
     label_df_csv.to_csv(new_label_path, index=False)

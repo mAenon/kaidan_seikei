@@ -117,6 +117,7 @@ def make_new_label_csv(label: pd.DataFrame, cropped_data_list: [np.ndarray], sep
     with open(data_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(cropped_data_list)
+        print("saved :", data_path)
 
     for i, num in enumerate(separate_num):
         if num == 0:
